@@ -268,13 +268,11 @@ textCustomerType.pop(0)
 #We make a dictionnary based on the data
 CustomerTypeDict = {}
 
-for e in textVisitDetails:
-    VisitDetails_ID, Product_ID, Quantity, Visit_ID = e.replace("\n","").split(";")
-    VisitDetails_ID=int(VisitDetails_ID)
-    Product_ID=int(Product_ID)
-    Quantity=int(float(Quantity))
-    Visit_ID=int(float(Visit_ID))
-    VisitDetailsDict[VisitDetails_ID]= {"Product_ID":Product_ID,"Quantity": Quantity, "Visit_ID": Visit_ID, "Language": Language,"Season": Season}
+for e in textCustomerType:
+    Customer_ID, RouteTemplate_ID, CustomerType, Postcode, Language, Season = e.replace("\n","").split(";")
+    Customer_ID=int(float(Customer_ID))
+    RouteTemplate_ID=int(float(RouteTemplate_ID))
+    CompanyVisitDict[Customer_ID]= {"RouteTemplate_ID":RouteTemplate_ID,"CustomerType": CustomerType, "Postcode": Postcode, "Language": Language,"Season": Season}
 
 
 df_CustomerType = pd.DataFrame.from_dict(CustomerTypeDict, orient = 'index')
@@ -298,9 +296,10 @@ VisitDetailsDict = {}
 for e in textVisitDetails:
     VisitDetails_ID, Product_ID, Quantity, Visit_ID = e.replace("\n","").split(";")
     VisitDetails_ID=int(VisitDetails_ID)
+    Product_ID=int(Product_ID)
     Quantity=int(float(Quantity))
     Visit_ID=int(float(Visit_ID))
-    VisitDetailsDict[VisitDetails_ID]= {"Product_ID":Product_ID,"Quantity": Quantity, "Visit_ID": Visit_ID, "Language": Language,"Season": Season}
+    VisitDetailsDict[VisitDetails_ID]= {"Product_ID":Product_ID,"Quantity": Quantity, "Visit_ID": Visit_ID}
 
 df_VisitDetails = pd.DataFrame.from_dict(VisitDetailsDict, orient = 'index')
 

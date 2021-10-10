@@ -228,7 +228,16 @@ CompanyVisitDict = {}
 
 for e in textVisit:
     Visit_ID, Customer_ID, Employee_ID, VisitOutcome_ID, Time, Date, Amount, paymentMethod = e.replace("\n","").split(";")
+    
+    Visit_ID, Customer_ID, Employee_ID, VisitOutcome_ID, Time, Date, Amount, paymentMethod = e.replace("\n","").split(";")
     Visit_ID= int(Visit_ID)
+
+    yYear, mMonth, dDay = Date.split("-")
+    yYear = int(yYear)
+    mMonth = int(mMonth)
+    dDay = int(dDay)
+    Date=datetime.date(yYear,mMonth,dDay)
+
     Customer_ID= int(Customer_ID)
     Employee_ID= int(Employee_ID)
     VisitOutcome_ID= int(VisitOutcome_ID)
@@ -259,11 +268,13 @@ textCustomerType.pop(0)
 #We make a dictionnary based on the data
 CustomerTypeDict = {}
 
-for e in textCustomerType:
-    Customer_ID, RouteTemplate_ID, CustomerType, Postcode, Language, Season = e.replace("\n","").split(";")
-    Customer_ID=int(float(Customer_ID))
-    RouteTemplate_ID=int(float(RouteTemplate_ID))
-    CustomerTypeDict[Customer_ID]= {"RouteTemplate_ID":RouteTemplate_ID,"CustomerType": CustomerType, "Postcode": Postcode, "Language": Language,"Season": Season}
+for e in textVisitDetails:
+    VisitDetails_ID, Product_ID, Quantity, Visit_ID = e.replace("\n","").split(";")
+    VisitDetails_ID=int(VisitDetails_ID)
+    Product_ID=int(Product_ID)
+    Quantity=int(float(Quantity))
+    Visit_ID=int(float(Visit_ID))
+    VisitDetailsDict[VisitDetails_ID]= {"Product_ID":Product_ID,"Quantity": Quantity, "Visit_ID": Visit_ID, "Language": Language,"Season": Season}
 
 
 df_CustomerType = pd.DataFrame.from_dict(CustomerTypeDict, orient = 'index')
@@ -340,3 +351,58 @@ BestRevCat=BestRevProducts.groupby("Category")["RevenueProduct"].sum().sort_valu
 #Based on Catogery
 #Amount sold
 BestAmountCat=BestRevProducts.groupby("Category")["Quantity"].sum().sort_values(ascending=False)
+
+#-> 2.6. Do customers have different buying patterns during the weekend?
+#This method uses the weekday function to determine the day of the week starting 
+#At 0 for Monday and ending on 6 for Sunday for a given month and year
+#In this way if the returned number is larger than 4 (Friday) it is a weekendDay
+def getWeekIndex(d: datetime.date):
+    if(d.weekday()>4):
+        return "weekend"
+    else:
+        return "weekday"
+
+#We add a new Column explaining wheter it is a weekday or weekend based on the Date index
+df_CompanyVisit["DateIndex"] = df_CompanyVisit["Date"].apply(getWeekIndex)
+df_CompanyVisit["Visit_ID"] = df_CompanyVisit.index
+
+CompleteMerge = pd.merge(df_VisitDetails, df_CompanyVisit, on="Visit_ID")
+
+
+df_Products["Product_ID"] = df_Products.index
+CompleteMergeProd = pd.merge(CompleteMerge,df_Products, on="Product_ID").drop(columns=["Language", "paymentMethod", "Amount", "Time"])
+CompleteMergeProd["Revenue"]=CompleteMergeProd["Quantity"]*CompleteMergeProd["Price"]
+
+OnlyWeekdays= CompleteMergeProd[CompleteMergeProd["DateIndex"] != "weekend"]
+OnlyWeekends= CompleteMergeProd[CompleteMergeProd["DateIndex"] != "weekday"]
+
+OnlyWeekdaysCus = OnlyWeekdays.groupby(["Customer_ID","DateIndex"])["Revenue"].sum()
+OnlyWeekendsCus = OnlyWeekends.groupby(["Customer_ID","DateIndex"])["Revenue"].sum()
+Comparison = pd.merge(OnlyWeekendsCus,OnlyWeekdaysCus, on="Customer_ID")
+
+#X is weekends Y is weekdays
+#This shows the difference in Revenue expressed in mean and other statistics
+#Comparing the weekend and 
+#print(Comparison.describe())
+
+
+OnlyWeekdaysPro =  OnlyWeekdays.groupby(["Product_ID","DateIndex"])["Revenue"].sum()
+OnlyWeekendsPro =  OnlyWeekends.groupby(["Product_ID","DateIndex"])["Revenue"].sum()
+OnlyWeekdaysProMerged = pd.merge(OnlyWeekdaysPro,df_Products, on="Product_ID").drop(columns="Price")
+OnlyWeekendsProMerged =  pd.merge(OnlyWeekendsPro,df_Products, on="Product_ID").drop(columns="Price")
+
+OnlyWeekdaysProMergedFam =  pd.merge(OnlyWeekdaysPro,df_Products, how="left",on="Product_ID").drop(columns="Price").groupby("Family")["Revenue"].sum()
+OnlyWeekendsProMergedFam =  pd.merge(OnlyWeekendsPro,df_Products, how="left",on="Product_ID").drop(columns="Price").groupby("Family")["Revenue"].sum()
+
+#X is weekends Y is weekdays
+#This show what Family sells more during either weekend or weekday
+WeekendComparedFam = pd.merge(OnlyWeekendsProMergedFam,OnlyWeekdaysProMergedFam, on="Family")
+#print(WeekendComparedFam)
+
+OnlyWeekdaysProMergedDes =  pd.merge(OnlyWeekdaysPro,df_Products, how="left",on="Product_ID").drop(columns="Price").groupby("Description")["Revenue"].sum()
+OnlyWeekendsProMergedDes =  pd.merge(OnlyWeekendsPro,df_Products, how="left",on="Product_ID").drop(columns="Price").groupby("Description")["Revenue"].sum()
+
+#X is weekends Y is weekdays
+#This show which products sell more during either weekend or weekday
+WeekendComparedDis= pd.merge(OnlyWeekendsProMergedDes,OnlyWeekdaysProMergedDes, on="Description")
+print(WeekendComparedDis.head(289))

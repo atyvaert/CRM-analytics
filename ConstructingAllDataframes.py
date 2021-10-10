@@ -405,4 +405,4 @@ OnlyWeekendsProMergedDes =  pd.merge(OnlyWeekendsPro,df_Products, how="left",on=
 #X is weekends Y is weekdays
 #This show which products sell more during either weekend or weekday
 WeekendComparedDis= pd.merge(OnlyWeekendsProMergedDes,OnlyWeekdaysProMergedDes, on="Description")
-print(WeekendComparedDis.head(289))
+#print(WeekendComparedDis.head(289))

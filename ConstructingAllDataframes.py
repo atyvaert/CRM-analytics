@@ -263,7 +263,7 @@ for e in textCustomerType:
     Customer_ID, RouteTemplate_ID, CustomerType, Postcode, Language, Season = e.replace("\n","").split(";")
     Customer_ID=int(float(Customer_ID))
     RouteTemplate_ID=int(float(RouteTemplate_ID))
-    CompanyVisitDict[Customer_ID]= {"RouteTemplate_ID":RouteTemplate_ID,"CustomerType": CustomerType, "Postcode": Postcode, "Language": Language,"Season": Season}
+    CustomerTypeDict[Customer_ID]= {"RouteTemplate_ID":RouteTemplate_ID,"CustomerType": CustomerType, "Postcode": Postcode, "Language": Language,"Season": Season}
 
 
 df_CustomerType = pd.DataFrame.from_dict(CustomerTypeDict, orient = 'index')
@@ -289,7 +289,7 @@ for e in textVisitDetails:
     VisitDetails_ID=int(VisitDetails_ID)
     Quantity=int(float(Quantity))
     Visit_ID=int(float(Visit_ID))
-    CompanyVisitDict[VisitDetails_ID]= {"Product_ID":Product_ID,"Quantity": Quantity, "Visit_ID": Visit_ID, "Language": Language,"Season": Season}
+    VisitDetailsDict[VisitDetails_ID]= {"Product_ID":Product_ID,"Quantity": Quantity, "Visit_ID": Visit_ID, "Language": Language,"Season": Season}
 
 df_VisitDetails = pd.DataFrame.from_dict(VisitDetailsDict, orient = 'index')
 

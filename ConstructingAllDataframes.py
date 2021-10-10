@@ -308,3 +308,35 @@ df_VisitDetails = pd.DataFrame.from_dict(VisitDetailsDict, orient = 'index')
 # 10 df_CustomerType (HVC_SO0)
 # 11 df_VisitDetails (HVC_VISITRESULTDETAILS)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+###########################
+#Q2. Who are the customers?
+###########################
+# -> 2.1. What do customers buy?
+CompanyTotalProductSales = {}
+Aureum = df_VisitDetails.groupby("Product_ID")["Quantity"].sum()
+newAU = pd.merge(Aureum, df_Products, how="left", on=Aureum.keys())
+Revenue = newAU["Price"]*newAU["Quantity"]
+newAU["RevenueProduct"] = Revenue
+
+#Best products based on revenue
+BestRevProducts = newAU.sort_values(by="RevenueProduct", ascending=False)
+
+#Most products sold in ammount
+BestAmountSoldProducts = newAU.sort_values(by="Quantity", ascending=False)
+
+#Based on Family
+#Generated Revenue
+BestRevFamily=BestRevProducts.groupby("Family")["RevenueProduct"].sum().sort_values(ascending=False)
+
+#Based on Family
+#Amount sold
+BestAmountFamily=BestAmountSoldProducts.groupby("Family")["Quantity"].sum().sort_values(ascending=False)
+
+#Based on Catogery
+#Generated Revenue
+BestRevCat=BestRevProducts.groupby("Category")["RevenueProduct"].sum().sort_values(ascending=False)
+
+#Based on Catogery
+#Amount sold
+BestAmountCat=BestRevProducts.groupby("Category")["Quantity"].sum().sort_values(ascending=False)

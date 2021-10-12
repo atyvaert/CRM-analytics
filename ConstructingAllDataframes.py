@@ -351,6 +351,20 @@ BestRevCat=BestRevProducts.groupby("Category")["RevenueProduct"].sum().sort_valu
 #Amount sold
 BestAmountCat=BestRevProducts.groupby("Category")["Quantity"].sum().sort_values(ascending=False)
 
+# -> 2.2. Which customers left the company?
+#We make an assumption: Not having visited for 6 months: leaving the company 182 days
+mostRecent= max(df_CompanyVisit["Date"]) - datetime.timedelta(0)
+mostRecentTest = mostRecent - datetime.timedelta(182)
+print(mostRecent-mostRecentTest)
+df_CompanyVisit["LastVisit"]= datetime.date.today() - df_CompanyVisit["Date"]
+def isOk(dateCh: datetime.date):
+    if((mostRecent-dateCh)> (mostRecent-mostRecentTest)):
+        return True
+    else:
+        return False
+df_CompanyVisit["Churn?"]=df_CompanyVisit["Date"].apply(isOk)        
+#print(df_CompanyVisit.head(5))
+
 # -> 2.3. Which customers have the highest CLV
 #We sort CompanyVisit on visitoutcomeID 2 since these indicate a visit where items have been bought
 df_OnlySuccesFullVisits= df_CompanyVisit[df_CompanyVisit["VisitOutcome_ID"] == 2]

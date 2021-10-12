@@ -351,6 +351,14 @@ BestRevCat=BestRevProducts.groupby("Category")["RevenueProduct"].sum().sort_valu
 #Amount sold
 BestAmountCat=BestRevProducts.groupby("Category")["Quantity"].sum().sort_values(ascending=False)
 
+# -> 2.3. Which customers have the highest CLV
+#We sort CompanyVisit on visitoutcomeID 2 since these indicate a visit where items have been bought
+df_OnlySuccesFullVisits= df_CompanyVisit[df_CompanyVisit["VisitOutcome_ID"] == 2]
+df_OnlySuccesFullVisits= df_OnlySuccesFullVisits.sort_values("Customer_ID")
+#We sum the amounts of money spent per Customer_ID and this gives us after sorting the CLV of all Customers in descending order
+df_CLV=df_OnlySuccesFullVisits.groupby("Customer_ID")["Amount"].sum().sort_values(ascending=False)
+print(df_CLV.head(50))
+
 #-> 2.6. Do customers have different buying patterns during the weekend?
 #This method uses the weekday function to determine the day of the week starting 
 #At 0 for Monday and ending on 6 for Sunday for a given month and year

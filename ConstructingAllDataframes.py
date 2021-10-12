@@ -413,3 +413,20 @@ OnlyWeekendsProMergedDes =  pd.merge(OnlyWeekendsPro,df_Products, how="left",on=
 #This show which products sell more during either weekend or weekday
 WeekendComparedDis= pd.merge(OnlyWeekendsProMergedDes,OnlyWeekdaysProMergedDes, on="Description")
 #print(WeekendComparedDis.head(289))
+
+# -> 2.7. Do customer sales differ across cities? is there a relationship
+#    between customer sales and average income(+other factors)
+df_CustomerType["CLV"]=df_CLV
+df_CustomerType = df_CustomerType.dropna(axis="rows")
+df_RouteTemplate["RouteTemplate_ID"]=df_RouteTemplate.index
+
+#This compares CLV over all regions
+df_CLV_Route = pd.merge(df_CustomerType,df_RouteTemplate, on="RouteTemplate_ID")
+df_CLV_Route_Region = df_CLV_Route.groupby("REGION")["CLV"].sum()
+#print(df_CLV_Route_Region)
+
+#Compares CLV over all Cities
+df_Depot=df_Depot.rename(columns={"HVROUTETEMPLATE_NRID": "RouteTemplate_ID"})
+df_CLV_Cities= pd.merge(df_CLV_Route,df_Depot,on="RouteTemplate_ID").groupby("DEPOT")["CLV"].sum()
+print(df_CLV_Cities.head(5))
+

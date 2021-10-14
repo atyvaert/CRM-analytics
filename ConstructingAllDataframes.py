@@ -303,6 +303,8 @@ for e in textVisitDetails:
 
 df_VisitDetails = pd.DataFrame.from_dict(VisitDetailsDict, orient = 'index')
 
+#Let us add a selfmade dataframe for the average and median household income per postal code. The csv file is called: Income_per_postcode2
+df_Income_per_postcode = pd.read_csv("Income_per_postcode2.csv")
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #This gives us the following 11 dataframes to work with:
@@ -317,6 +319,7 @@ df_VisitDetails = pd.DataFrame.from_dict(VisitDetailsDict, orient = 'index')
 # 9  df_CompanyVisit (HVC_VISITRESULT)
 # 10 df_CustomerType (HVC_SO0)
 # 11 df_VisitDetails (HVC_VISITRESULTDETAILS)
+# 12 df_Income_per_postcode (Income_per_postcode2, the link for this data is based on this information: https://statbel.fgov.be/nl/themas/huishoudens/fiscale-inkomens#panel-13)
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ###########################

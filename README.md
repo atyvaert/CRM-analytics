@@ -2,4 +2,4 @@
 
 We also have provided a pdf where we anwser all questions explictly,
 incase this would not have been done so in the code completely. 
-All questions have been anwsered
+All questions have been anwsered.
